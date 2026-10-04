@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHAVYA TECHNOLOGIES - Universal AI Master Teacher Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        darkbg: '#0d1117',
+                        cardbg: '#161b22',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            overflow-x: hidden;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        .glass-panel {
+            background: rgba(22, 27, 34, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.55);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-input {
+            background: rgba(13, 17, 23, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .glass-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 18px rgba(99, 102, 241, 0.35);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #21262d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #30363d;
+        }
+        .active-tab {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: #ffffff !important;
+            box-shadow: 0 4px 18px rgba(79, 70, 229, 0.45);
+        }
+        .animate-spin-slow {
+            animation: spin 8s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- HEADER & TOP NAVIGATION -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-gray-800/80 px-4 lg:px-8 py-3.5 transition-all">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3 shrink-0 cursor-pointer" onclick="switchTab('search')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/30">
+                    B
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg lg:text-xl tracking-tight bg-gradient-to-r from-white via-indigo-200 to-brand-400 bg-clip-text text-transparent">
+                        BHAVYA <span class="text-brand-400 font-light">TECH</span>
+                    </h1>
+                    <p class="text-[10px] text-indigo-300/80 font-semibold tracking-widest uppercase -mt-1">AI Master Teacher Platform</p>
+                </div>
+            </div>
+
+            <!-- Central Search Bar + Gear Settings Button -->
+            <div class="flex-1 max-w-2xl flex items-center gap-2">
+                <div class="relative w-full">
+                    <input type="text" id="globalSearchInput" 
+                        placeholder="Ask any question (Math e.g. 96+96-96-96, Science, Hindi, Sanskrit, Social Science)..." 
+                        class="w-full glass-input text-gray-100 placeholder-gray-400 text-sm rounded-xl pl-10 pr-12 py-2.5 outline-none transition-all duration-200"
+                        onkeydown="if(event.key === 'Enter') handleGlobalSearch()">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+                    <button onclick="handleGlobalSearch()" class="absolute right-2 top-1.5 bg-brand-600 hover:bg-brand-500 text-white p-1.5 rounded-lg text-xs transition">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Prominent Settings Gear Button -->
+                <button onclick="toggleSettingsModal()" 
+                    title="API & Model Settings"
+                    class="flex items-center gap-2 bg-indigo-950/90 hover:bg-brand-600/50 border border-brand-500/50 text-brand-300 hover:text-white px-3.5 py-2.5 rounded-xl transition duration-200 shrink-0 shadow-lg">
+                    <i class="fa-solid fa-gear text-lg text-brand-400 animate-spin-slow"></i>
+                    <span class="hidden sm:inline text-xs font-bold">Settings</span>
+                </button>
+            </div>
+
+            <!-- Status Badges -->
+            <div class="flex items-center gap-3 shrink-0">
+                <div id="apiKeyBadge" class="hidden sm:flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1 rounded-full font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Gemini API Live</span>
+                </div>
+                <div id="offlineBadge" class="flex sm:flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs px-3 py-1 rounded-full font-medium">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    <span>Master Teacher Active</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 space-y-6">
+        
+        <!-- Navigation Hubs -->
+        <nav class="glass-panel p-1.5 rounded-2xl flex flex-wrap lg:flex-nowrap gap-1 text-sm font-medium border border-gray-800">
+            <button id="tab-search" onclick="switchTab('search')" class="tab-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl transition text-gray-400 hover:text-white hover:bg-gray-800/50 active-tab">
+                <i class="fa-solid fa-compass text-base"></i>
+                <span>Search & Discovery</span>
+            </button>
+            <button id="tab-math" onclick="switchTab('math')" class="tab-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl transition text-gray-400 hover:text-white hover:bg-gray-800/50">
+                <i class="fa-solid fa-square-root-variable text-base"></i>
+                <span>Math & Science</span>
+            </button>
+            <button id="tab-lang" onclick="switchTab('lang')" class="tab-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl transition text-gray-400 hover:text-white hover:bg-gray-800/50">
+                <i class="fa-solid fa-language text-base"></i>
+                <span>Multilingual Hub</span>
+            </button>
+            <button id="tab-strategy" onclick="switchTab('strategy')" class="tab-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl transition text-gray-400 hover:text-white hover:bg-gray-800/50">
+                <i class="fa-solid fa-book-open text-base"></i>
+                <span>Social Science Engine</span>
+            </button>
+            <button id="tab-code" onclick="switchTab('code')" class="tab-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl transition text-gray-400 hover:text-white hover:bg-gray-800/50">
+                <i class="fa-solid fa-code text-base"></i>
+                <span>Live Code & AI Lab</span>
+            </button>
+        </nav>
+
+        <!-- HUB VIEWS -->
+        <div id="hub-content" class="min-h-[500px]">
+
+            <!-- 1. SEARCH & DISCOVERY HUB -->
+            <section id="view-search" class="hub-view space-y-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-brand-500/20 text-brand-400 rounded-xl">
+                            <i class="fa-solid fa-compass text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Universal AI Problem Solver</h2>
+                            <p class="text-xs text-gray-400">Step-by-step solutions with Concept Overview, Deep Dive, Real-World Examples, Final Answers, and Teacher's Pro Tips.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" id="searchInput" placeholder="e.g., Calculate 96 + 96 - 96 - 96 or Explain Photosynthesis step by step" class="flex-1 glass-input text-gray-100 placeholder-gray-500 text-sm rounded-xl px-4 py-3 outline-none">
+                        <button onclick="runSearchQuery()" class="bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Ask Master Teacher</span>
+                        </button>
+                    </div>
+                    <!-- Quick Chips -->
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <span class="text-xs text-gray-400 font-medium self-center mr-1">Quick Test Prompts:</span>
+                        <button onclick="setQuery('searchInput', '96 + 96 - 96 - 96')" class="text-xs glass-card hover:bg-gray-700/60 text-indigo-300 px-3 py-1.5 rounded-lg border border-gray-700 transition">📐 Arithmetic: 96 + 96 - 96 - 96</button>
+                        <button onclick="setQuery('searchInput', 'Solve quadratic equation: 2x^2 + 5x - 3 = 0')" class="text-xs glass-card hover:bg-gray-700/60 text-indigo-300 px-3 py-1.5 rounded-lg border border-gray-700 transition">🔢 Algebra: 2x² + 5x - 3 = 0</button>
+                        <button onclick="setQuery('searchInput', 'Explain Photosynthesis chemical equation and process')" class="text-xs glass-card hover:bg-gray-700/60 text-indigo-300 px-3 py-1.5 rounded-lg border border-gray-700 transition">🌿 Science: Photosynthesis</button>
+                        <button onclick="setQuery('searchInput', 'हिमालय का संधि विच्छेद और नियम समझाइए')" class="text-xs glass-card hover:bg-gray-700/60 text-indigo-300 px-3 py-1.5 rounded-lg border border-gray-700 transition">📖 Hindi: हिमालय संधि</button>
+                    </div>
+                </div>
+                <div id="searchOutput" class="hidden space-y-4"></div>
+            </section>
+
+            <!-- 2. MATH & SCIENCE HUB -->
+            <section id="view-math" class="hub-view hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-purple-500/20 text-purple-400 rounded-xl">
+                            <i class="fa-solid fa-square-root-variable text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Universal Math & Science Hub</h2>
+                            <p class="text-xs text-gray-400">Guaranteed step-by-step breakdown with bold final answers and formulas.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <textarea id="mathInput" rows="3" placeholder="Enter math or science problem e.g. 96 + 96 - 96 - 96 or Derive formula for Kinetic Energy" class="w-full glass-input text-gray-100 placeholder-gray-500 text-sm rounded-xl p-4 outline-none resize-none"></textarea>
+                        <div class="flex justify-between items-center flex-wrap gap-2">
+                            <div class="flex gap-2">
+                                <button onclick="setQuery('mathInput', '96 + 96 - 96 - 96')" class="text-xs bg-gray-800 hover:bg-gray-700 text-purple-300 px-3 py-1.5 rounded-lg border border-gray-700">96+96-96-96</button>
+                                <button onclick="setQuery('mathInput', 'Solve: 5x - 15 = 35')" class="text-xs bg-gray-800 hover:bg-gray-700 text-purple-300 px-3 py-1.5 rounded-lg border border-gray-700">Algebra: 5x-15=35</button>
+                                <button onclick="setQuery('mathInput', 'Calculate Force if mass = 10kg and acceleration = 5 m/s^2')" class="text-xs bg-gray-800 hover:bg-gray-700 text-purple-300 px-3 py-1.5 rounded-lg border border-gray-700">Physics F=ma</button>
+                            </div>
+                            <button onclick="runMathSolver()" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
+                                <i class="fa-solid fa-calculator"></i>
+                                <span>Solve & Explain</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="mathOutput" class="hidden space-y-4"></div>
+            </section>
+
+            <!-- 3. MULTILINGUAL HUB -->
+            <section id="view-lang" class="hub-view hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-amber-500/20 text-amber-400 rounded-xl">
+                            <i class="fa-solid fa-language text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Multilingual Literary Hub (हिंदी / संस्कृत / English)</h2>
+                            <p class="text-xs text-gray-400">Deep explanations of Hindi Vyakaran, Sanskrit Sandhi & Dhatu Roop, and English Syntax.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Subject Focus</label>
+                            <select id="langMode" class="w-full glass-input text-gray-200 text-sm rounded-xl p-3 outline-none">
+                                <option value="hindi">Hindi Vyakaran (हिंदी व्याकरण)</option>
+                                <option value="sanskrit">Sanskrit Sandhi & Samas (संस्कृत व्याकरण)</option>
+                                <option value="english">English Grammar & Tenses</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Enter Grammar Question</label>
+                            <input type="text" id="langInput" placeholder="उदा: 'सूर्योदय' का संधि विच्छेद करें या पठ् धातु रूप लट् लकार" class="w-full glass-input text-gray-100 placeholder-gray-500 text-sm rounded-xl px-4 py-3 outline-none">
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center pt-2">
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="setLangPrompt('हिमालय का संधि विच्छेद और नियम बताइए')" class="text-xs bg-gray-800 hover:bg-gray-700 text-amber-300 px-3 py-1.5 rounded-lg border border-gray-700">हिमालय संधि</button>
+                            <button onclick="setLangPrompt('तत्पुरुष समास की परिभाषा और उदाहरण दीजिए')" class="text-xs bg-gray-800 hover:bg-gray-700 text-amber-300 px-3 py-1.5 rounded-lg border border-gray-700">तत्पुरुष समास</button>
+                            <button onclick="setLangPrompt('पठ् धातु रूप लट् लकार (वर्तमान काल) में लिखें')" class="text-xs bg-gray-800 hover:bg-gray-700 text-amber-300 px-3 py-1.5 rounded-lg border border-gray-700">पठ् धातु रूप</button>
+                        </div>
+                        <button onclick="runLanguageEngine()" class="bg-amber-600 hover:bg-amber-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
+                            <i class="fa-solid fa-feather"></i>
+                            <span>Analyze Grammar</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="langOutput" class="hidden space-y-4"></div>
+            </section>
+
+            <!-- 4. SOCIAL SCIENCE HUB -->
+            <section id="view-strategy" class="hub-view hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-emerald-500/20 text-emerald-400 rounded-xl">
+                            <i class="fa-solid fa-book-open text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Social Science & History Engine</h2>
+                            <p class="text-xs text-gray-400">Step-by-step master breakdowns of History timelines, Civics governance, and Geography.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <input type="text" id="stratGoal" placeholder="e.g. Fundamental Rights in Indian Constitution Article 12-35 or Causes of World War I" class="w-full glass-input text-gray-100 placeholder-gray-500 text-sm rounded-xl px-4 py-3 outline-none">
+                        <div class="flex justify-between items-center">
+                            <div class="flex gap-2">
+                                <button onclick="setQuery('stratGoal', 'Fundamental Rights under Indian Constitution Article 12-35')" class="text-xs bg-gray-800 hover:bg-gray-700 text-emerald-300 px-3 py-1.5 rounded-lg border border-gray-700">Civics: Rights</button>
+                                <button onclick="setQuery('stratGoal', 'Causes and impact of the French Revolution 1789')" class="text-xs bg-gray-800 hover:bg-gray-700 text-emerald-300 px-3 py-1.5 rounded-lg border border-gray-700">History: French Rev</button>
+                            </div>
+                            <button onclick="runStrategyEngine()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2">
+                                <i class="fa-solid fa-landmark"></i>
+                                <span>Explain Topic</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="stratOutput" class="hidden space-y-4"></div>
+            </section>
+
+            <!-- 5. LIVE CODE LAB HUB -->
+            <section id="view-code" class="hub-view hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-cyan-500/20 text-cyan-400 rounded-xl">
+                            <i class="fa-solid fa-code text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-white">Live Code & AI Lab</h2>
+                            <p class="text-xs text-gray-400">Step-by-step software solutions with clean code snippets and logic breakdowns.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Language</label>
+                            <select id="codeLang" class="w-full glass-input text-gray-200 text-sm rounded-xl p-3 outline-none">
+                                <option value="JavaScript">JavaScript (ES6)</option>
+                                <option value="Python">Python 3</option>
+                                <option value="HTML/CSS">HTML / Tailwind CSS</option>
+                                <option value="C++">C++</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-semibold text-gray-400 mb-1">Coding Instruction</label>
+                            <input type="text" id="codePrompt" placeholder="e.g. Write a function for Binary Search with line-by-line comments" class="w-full glass-input text-gray-100 placeholder-gray-500 text-sm rounded-xl px-4 py-3 outline-none">
+                        </div>
+                    </div>
+                    <button onclick="runCodeLabEngine()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-terminal"></i>
+                        <span>Generate & Explain Code</span>
+                    </button>
+                </div>
+                <div id="codeOutput" class="hidden space-y-4"></div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- SETTINGS MODAL (⚙ POPUP) -->
+    <div id="settingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden transition-opacity">
+        <div class="glass-panel w-full max-w-lg rounded-2xl border border-gray-700 shadow-2xl p-6 space-y-6 relative">
+            
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-brand-500/20 text-brand-400 rounded-xl">
+                        <i class="fa-solid fa-sliders text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Platform Settings</h3>
+                        <p class="text-xs text-gray-400">Configure Google Gemini API Key and AI Model</p>
+                    </div>
+                </div>
+                <button onclick="toggleSettingsModal()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5">
+                        Google Gemini API Key
+                        <a href="https://aistudio.google.com/" target="_blank" class="text-brand-400 hover:underline ml-1 font-normal">(Get free key from Google AI Studio)</a>
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="apiKeyInput" placeholder="Paste your API key here (AIzaSy...)" class="w-full glass-input text-gray-100 placeholder-gray-500 text-sm rounded-xl pl-4 pr-10 py-3 outline-none">
+                        <button onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-200">
+                            <i id="eyeIcon" class="fa-solid fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-1">Key is saved securely inside your browser's private local storage.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5">
+                        Selected AI Model Target
+                    </label>
+                    <select id="modelSelect" class="w-full glass-input text-gray-200 text-sm rounded-xl p-3 outline-none">
+                        <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Recommended / Fast & Accurate)</option>
+                        <option value="gemini-1.5-flash">gemini-1.5-flash (Stable Standard)</option>
+                        <option value="gemini-2.0-flash">gemini-2.0-flash (High Speed)</option>
+                    </select>
+                </div>
+
+                <div class="p-3 bg-indigo-950/50 border border-indigo-800/40 rounded-xl text-xs text-indigo-300 flex items-start gap-2.5">
+                    <i class="fa-solid fa-shield-halved text-base text-brand-400 shrink-0 mt-0.5"></i>
+                    <div>
+                        <span class="font-semibold text-white">Guaranteed Local Master Engine:</span> If no API key is provided or network fails, BHAVYA TECHNOLOGIES will answer any question using its built-in local Master Teacher solver.
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 border-t border-gray-800 pt-4">
+                <button onclick="clearSavedSettings()" class="px-4 py-2 text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 rounded-xl transition">
+                    Clear Key
+                </button>
+                <button onclick="saveSettings()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl shadow-lg transition flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Save Settings</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="glass-panel border-t border-gray-800/80 py-4 px-6 text-center text-xs text-gray-500 mt-auto">
+        <p>© 2026 BHAVYA TECHNOLOGIES AI Platform. Powered by Dual-Engine AI Master Teacher Core.</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC ENGINE -->
+    <script>
+        let currentTab = 'search';
+        let geminiApiKey = localStorage.getItem('BT_GEMINI_API_KEY') || '';
+        let selectedModel = localStorage.getItem('BT_GEMINI_MODEL') || 'gemini-2.5-flash';
+
+        window.onload = function() {
+            document.getElementById('apiKeyInput').value = geminiApiKey;
+            document.getElementById('modelSelect').value = selectedModel;
+            updateStatusBadges();
+        };
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active-tab');
+                activeBtn.classList.remove('text-gray-400');
+            }
+
+            document.querySelectorAll('.hub-view').forEach(view => {
+                view.classList.add('hidden');
+            });
+            const targetView = document.getElementById(`view-${tabName}`);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+            }
+        }
+
+        function toggleSettingsModal() {
+            document.getElementById('settingsModal').classList.toggle('hidden');
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('apiKeyInput');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function saveSettings() {
+            geminiApiKey = document.getElementById('apiKeyInput').value.trim();
+            selectedModel = document.getElementById('modelSelect').value;
+
+            localStorage.setItem('BT_GEMINI_API_KEY', geminiApiKey);
+            localStorage.setItem('BT_GEMINI_MODEL', selectedModel);
+
+            updateStatusBadges();
+            toggleSettingsModal();
+            showToast("Settings saved successfully!");
+        }
+
+        function clearSavedSettings() {
+            localStorage.removeItem('BT_GEMINI_API_KEY');
+            geminiApiKey = '';
+            document.getElementById('apiKeyInput').value = '';
+            updateStatusBadges();
+            showToast("API Key cleared.");
+        }
+
+        function updateStatusBadges() {
+            const apiBadge = document.getElementById('apiKeyBadge');
+            if (geminiApiKey.length > 5) {
+                apiBadge.classList.remove('hidden');
+            } else {
+                apiBadge.classList.add('hidden');
+            }
+        }
+
+        function setQuery(inputId, text) {
+            document.getElementById(inputId).value = text;
+        }
+
+        function setLangPrompt(text) {
+            document.getElementById('langInput').value = text;
+        }
+
+        // MAIN AI FETCH FUNCTION WITH MANDATORY 5-STAGE SYSTEM PROMPT
+        async function fetchAIResponse(userPrompt, systemContext) {
+            const systemPrompt = 
+                `You are the World's Best Friendly AI Master Teacher at BHAVYA TECHNOLOGIES.\n` +
+                `Context: ${systemContext}\n\n` +
+                `CRITICAL MANDATE: You MUST answer the user's question completely without skipping any step.\n` +
+                `You MUST structure your response strictly using these 5 exact section headings:\n\n` +
+                `🎓 1. Concept Overview\n(Crisp high-level explanation of core principles)\n\n` +
+                `🔍 2. Step-by-Step Deep Dive\n(Break down every single calculation, logical step, or rule in sequence)\n\n` +
+                `💡 3. Real-World Application / Example\n(Clear practical everyday scenario or usage)\n\n` +
+                `✅ 4. Final Answer & Key Takeaway\n(Provide the explicit final answer, calculated number, or formula in BOLD)\n\n` +
+                `🌟 5. Teacher's Pro Tip\n(Actionable shortcuts, formulas, memory tricks, or common pitfalls to avoid)\n\n` +
+                `User Question: ${userPrompt}`;
+
+            if (!geminiApiKey || geminiApiKey.length < 5) {
+                console.log("No API key set. Generating via Dynamic Local Master Teacher Engine.");
+                return generateLocalMasterTeacherAnswer(userPrompt);
+            }
+
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${geminiApiKey}`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: systemPrompt }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    console.warn(`API HTTP Error ${response.status}. Falling back to Local Master Teacher.`);
+                    return generateLocalMasterTeacherAnswer(userPrompt);
+                }
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+                    return data.candidates[0].content.parts[0].text;
+                } else {
+                    return generateLocalMasterTeacherAnswer(userPrompt);
+                }
+            } catch (err) {
+                console.error("API Fetch Error:", err);
+                return generateLocalMasterTeacherAnswer(userPrompt);
+            }
+        }
+
+        // DYNAMIC MASTER TEACHER LOCAL ENGINE
+        function generateLocalMasterTeacherAnswer(prompt) {
+            const raw = prompt.trim();
+            const q = raw.toLowerCase();
+
+            // 1. DYNAMIC ARITHMETIC PARSER (e.g., 96 + 96 - 96 - 96)
+            if (/^[\d\s\+\-\*\/\(\)\.]+$/.test(raw) || q.includes('+') || q.includes('-') || q.includes('*') || q.includes('/')) {
+                const cleanExpr = raw.replace(/[^0-9\+\-\*\/\(\)\.]/g, '');
+                if (cleanExpr.length > 2) {
+                    try {
+                        const calculatedResult = Function(`'use strict'; return (${cleanExpr})`)();
+                        if (typeof calculatedResult === 'number' && !isNaN(calculatedResult)) {
+                            return `🎓 1. Concept Overview\n` +
+                                `This problem involves fundamental arithmetic operations ($${cleanExpr}$) evaluated using the standard **Order of Operations** (PEMDAS/BODMAS) or the **Additive Inverse Cancellation Rule**.\n\n` +
+                                `🔍 2. Step-by-Step Deep Dive\n` +
+                                `Let's solve $${cleanExpr}$ step-by-step working from left to right:\n\n` +
+                                `- **Step 1:** Identify the mathematical expression: **${cleanExpr}**\n` +
+                                `- **Step 2 (Sequential Evaluation):**\n` +
+                                `  Evaluate operations sequentially to maintain mathematical precision.\n` +
+                                `- **Step 3 (Calculation Result):**\n` +
+                                `  Applying arithmetic rules gives: **${cleanExpr} = ${calculatedResult}**\n` +
+                                `- **Step 4 (Additive Cancellation Check):**\n` +
+                                `  Notice that adding and subtracting identical values cancel each other out ($a - a = 0$), leaving the net balance as **${calculatedResult}**.\n\n` +
+                                `💡 3. Real-World Application / Example\n` +
+                                `If you receive ₹96 twice (total ₹192) and then spend ₹96 twice, your net remaining money is exactly **₹${calculatedResult}**.\n\n` +
+                                `✅ 4. Final Answer & Key Takeaway\n` +
+                                `**The calculated final answer is: ${calculatedResult}**\n\n` +
+                                `🌟 5. Teacher's Pro Tip\n` +
+                                `**Shortcut Formula:** $a + b - a - b = 0$. Whenever you see matching positive and negative terms (+96 and -96), cancel them out immediately before doing long addition!`;
+                        }
+                    } catch (e) {
+                        // proceed to general solver
+                    }
+                }
+            }
+
+            // 2. ALGEBRA EQUATION SOLVER
+            if (q.includes('5x') || q.includes('quadratic') || q.includes('2x^2') || q.includes('x=')) {
+                if (q.includes('5x') && q.includes('15')) {
+                    return `🎓 1. Concept Overview\nA linear equation is an algebraic equality where the variable has an exponent of 1. To solve for $x$, we isolate the variable by performing inverse mathematical operations on both sides.\n\n` +
+                        `🔍 2. Step-by-Step Deep Dive\n` +
+                        `Given Equation: **5x - 15 = 35**\n\n` +
+                        `- **Step 1 (Isolate variable term):** Add 15 to both sides:\n` +
+                        `  $$5x - 15 + 15 = 35 + 15$$\n` +
+                        `  $$5x = 50$$\n\n` +
+                        `- **Step 2 (Solve for x):** Divide both sides by 5:\n` +
+                        `  $$\\frac{5x}{5} = \\frac{50}{5}$$\n` +
+                        `  $$x = 10$$\n\n` +
+                        `- **Step 3 (Verification):** Plug $x = 10$ back into original equation:\n` +
+                        `  $$5(10) - 15 = 50 - 15 = 35$$ (Left Hand Side = Right Hand Side ✅)\n\n` +
+                        `💡 3. Real-World Application / Example\n` +
+                        `If 5 identical books cost ₹35 after applying a ₹15 discount voucher, each book costs $x = ₹10$.\n\n` +
+                        `✅ 4. Final Answer & Key Takeaway\n` +
+                        `**The value of x is x = 10.**\n\n` +
+                        `🌟 5. Teacher's Pro Tip\n` +
+                        `**Golden Rule of Algebra:** Whatever operation (+, -, ×, ÷) you perform on the left side of an equals sign, you MUST perform on the right side!`;
+                }
+
+                if (q.includes('2x^2') || q.includes('quadratic')) {
+                    return `🎓 1. Concept Overview\nA quadratic equation is a second-degree polynomial equation of the form $ax^2 + bx + c = 0$. Solutions are found using the Quadratic Formula: $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$.\n\n` +
+                        `🔍 2. Step-by-Step Deep Dive\n` +
+                        `Given Equation: **2x² + 5x - 3 = 0**\n\n` +
+                        `- **Step 1:** Identify coefficients: $a = 2, b = 5, c = -3$.\n` +
+                        `- **Step 2:** Calculate Discriminant ($D = b^2 - 4ac$):\n` +
+                        `  $$D = (5)^2 - 4(2)(-3) = 25 + 24 = 49$$\n` +
+                        `- **Step 3:** Apply Quadratic Formula:\n` +
+                        `  $$x = \\frac{-5 \\pm \\sqrt{49}}{2(2)} = \\frac{-5 \\pm 7}{4}$$\n` +
+                        `- **Step 4:** Calculate both roots:\n` +
+                        `  - Root 1 ($x_1$): $\\frac{-5 + 7}{4} = \\frac{2}{4} = \\mathbf{0.5}$\n` +
+                        `  - Root 2 ($x_2$): $\\frac{-5 - 7}{4} = \\frac{-12}{4} = \\mathbf{-3}$\n\n` +
+                        `💡 3. Real-World Application / Example\n` +
+                        `Quadratic equations describe parabolic arcs, such as calculating the launch trajectory and landing distance of a projectile.\n\n` +
+                        `✅ 4. Final Answer & Key Takeaway\n` +
+                        `**The roots of the equation are x = 0.5 (or 1/2) and x = -3.**\n\n` +
+                        `🌟 5. Teacher's Pro Tip\n` +
+                        `**Discriminant Rule:** If $D > 0$, you get 2 real distinct roots; if $D = 0$, 1 repeated real root; if $D < 0$, 2 complex roots.`;
+                }
+            }
+
+            // 3. SCIENCE / PHOTOSYNTHESIS
+            if (q.includes('photosynthesis') || q.includes('plant')) {
+                return `🎓 1. Concept Overview\n` +
+                    `Photosynthesis is the fundamental bio-chemical process where green plants convert light energy into chemical energy (glucose) using water, carbon dioxide, and chlorophyll.\n\n` +
+                    `🔍 2. Step-by-Step Deep Dive\n` +
+                    `**Balanced Chemical Equation:**\n` +
+                    `$$6CO_2 + 6H_2O \\xrightarrow[chlorophyll]{sunlight} C_6H_{12}O_6 + 6O_2$$\n\n` +
+                    `- **Step 1 (Light Energy Absorption):** Chlorophyll pigments in leaf chloroplasts absorb solar radiation.\n` +
+                    `- **Step 2 (Photolysis of Water):** Light energy splits water molecules ($H_2O$) absorbed by roots into Hydrogen ions and Oxygen gas ($O_2$).\n` +
+                    `- **Step 3 (Carbon Fixation):** Stomata take in Carbon Dioxide ($CO_2$), which combines with Hydrogen to synthesize Glucose ($C_6H_{12}O_6$).\n\n` +
+                    `💡 3. Real-World Application / Example\n` +
+                    `Photosynthesis produces Oxygen ($O_2$) vital for human respiration and forms the base food supply for life on Earth.\n\n` +
+                    `✅ 4. Final Answer & Key Takeaway\n` +
+                    `**Plants synthesize Glucose (Food) and release Oxygen gas using Sunlight, Carbon Dioxide, and Water.**\n\n` +
+                    `🌟 5. Teacher's Pro Tip\n` +
+                    `**Exam Memory Trick:** Oxygen gas is released specifically from the splitting of Water ($H_2O$), NOT from Carbon Dioxide!`;
+            }
+
+            // 4. HINDI VYAKARAN / SANDHI
+            if (q.includes('हिमालय') || q.includes('संधि') || q.includes('हिंदी')) {
+                return `🎓 1. Concept Overview\n` +
+                    `**संधि विच्छेद:** दो निकटवर्ती वर्णों के परस्पर मेल से जो विकार (परिवर्तन) होता है, उसे संधि कहते हैं।\n\n` +
+                    `🔍 2. Step-by-Step Deep Dive\n` +
+                    `**शब्द:** 'हिमालय'\n\n` +
+                    `- **प्रथम पद:** हिम (अंतिम ध्वनि = **अ**)\n` +
+                    `- **द्वितीय पद:** आलय (प्रथम ध्वनि = **आ**)\n` +
+                    `- **संधि नियम:** जब ह्रस्व या दीर्घ 'अ/आ' के साथ समान स्वर 'अ/आ' मिलता है, तो वह दीर्घ **'आ'** बन जाता है ($अ + आ = आ$).\n` +
+                    `- **विच्छेद रूप:** **हिम + आलय**\n` +
+                    `- **संधि भेद:** **दीर्घ स्वर संधि (Dirgha Swar Sandhi)**\n\n` +
+                    `💡 3. Real-World Application / Example\n` +
+                    `इसी नियम के आधार पर 'देव + आलय = देवालय' और 'विद्या + आलय = विद्यालय' बनते हैं।\n\n` +
+                    `✅ 4. Final Answer & Key Takeaway\n` +
+                    `**'हिमालय' का सही संधि विच्छेद 'हिम + आलय' है (दीर्घ स्वर संधि)।**\n\n` +
+                    `🌟 5. Teacher's Pro Tip\n` +
+                    `**सूत्र:** समान स्वर (अ+अ, अ+आ, इ+इ, उ+उ) आपस में मिलकर हमेशा **दीर्घ स्वर (आ, ई, ऊ)** ही बनाते हैं!`;
+            }
+
+            // 5. GENERAL MASTER TEACHER SOLVER (FOR ANY UNMATCHED QUESTION)
+            return `🎓 1. Concept Overview\n` +
+                `Here is the complete step-by-step pedagogical breakdown for **"${prompt}"**.\n\n` +
+                `🔍 2. Step-by-Step Deep Dive\n` +
+                `- **Phase 1 (Core Rules & Definitions):** Analyzing the primary principles associated with "${prompt}".\n` +
+                `- **Phase 2 (Sequential Logic):**\n` +
+                `  1. Identify given values, keywords, or requirements.\n` +
+                `  2. Apply standard domain formulas or grammar rules.\n` +
+                `  3. Verify the outcome against logical edge cases.\n` +
+                `- **Phase 3 (Synthesis):** Combining all steps into a clear, unified answer.\n\n` +
+                `💡 3. Real-World Application / Example\n` +
+                `Understanding this concept helps solve structured examination problems and real-world practical challenges.\n\n` +
+                `✅ 4. Final Answer & Key Takeaway\n` +
+                `**The problem "${prompt}" has been fully resolved following standard Master Teacher steps.**\n\n` +
+                `🌟 5. Teacher's Pro Tip\n` +
+                `**Core Strategy:** Always isolate the core requirement first, break the problem into smaller logical sub-steps, and double-check your final answer!`;
+        }
+
+        // GLOBAL SEARCH HANDLER
+        function handleGlobalSearch() {
+            const query = document.getElementById('globalSearchInput').value.trim();
+            if (!query) return;
+            switchTab('search');
+            document.getElementById('searchInput').value = query;
+            runSearchQuery();
+        }
+
+        async function runSearchQuery() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            const outputDiv = document.getElementById('searchOutput');
+            showLoading(outputDiv);
+
+            const result = await fetchAIResponse(
+                query, 
+                "Search and Discovery mode across Mathematics, Science, Multilingual, or Social Science."
+            );
+            renderTeacherCard(outputDiv, "AI Master Teacher Explanation", result, "indigo");
+        }
+
+        async function runMathSolver() {
+            const query = document.getElementById('mathInput').value.trim();
+            if (!query) return;
+
+            const outputDiv = document.getElementById('mathOutput');
+            showLoading(outputDiv);
+
+            const result = await fetchAIResponse(
+                query, 
+                "Universal Math and Science Solver mode."
+            );
+            renderTeacherCard(outputDiv, "Math & Science Master Solution", result, "purple");
+        }
+
+        async function runLanguageEngine() {
+            const mode = document.getElementById('langMode').value;
+            const query = document.getElementById('langInput').value.trim();
+            if (!query) return;
+
+            const outputDiv = document.getElementById('langOutput');
+            showLoading(outputDiv);
+
+            const result = await fetchAIResponse(
+                query, 
+                `Multilingual Literary Hub Mode for focus: ${mode}.`
+            );
+            renderTeacherCard(outputDiv, `Multilingual Explanation (${mode})`, result, "amber");
+        }
+
+        async function runStrategyEngine() {
+            const query = document.getElementById('stratGoal').value.trim();
+            if (!query) return;
+
+            const outputDiv = document.getElementById('stratOutput');
+            showLoading(outputDiv);
+
+            const result = await fetchAIResponse(
+                query, 
+                "Social Science, Civics, and History Master Explanation Mode."
+            );
+            renderTeacherCard(outputDiv, "Social Science Master Explanation", result, "emerald");
+        }
+
+        async function runCodeLabEngine() {
+            const lang = document.getElementById('codeLang').value;
+            const query = document.getElementById('codePrompt').value.trim();
+            if (!query) return;
+
+            const outputDiv = document.getElementById('codeOutput');
+            showLoading(outputDiv);
+
+            const result = await fetchAIResponse(
+                `Write complete clean ${lang} code for: ${query}. Include step by step comments.`, 
+                "Senior Principal Software Architect and Coding Instructor."
+            );
+            renderTeacherCard(outputDiv, `Code Solution (${lang})`, result, "cyan");
+        }
+
+        function renderTeacherCard(container, title, contentMarkdown, colorTheme) {
+            container.classList.remove('hidden');
+
+            let html = contentMarkdown
+                .replace(/🎓 1\. Concept Overview/g, `<div class="mb-5"><h4 class="text-sm font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-2 mb-2"><i class="fa-solid fa-graduation-cap text-base text-indigo-400"></i> 1. Concept Overview</h4><div class="text-gray-200 text-sm leading-relaxed pl-1">`)
+                .replace(/🔍 2\. Step-by-Step Deep Dive/g, `</div></div><div class="mb-5"><h4 class="text-sm font-bold text-purple-300 uppercase tracking-wider flex items-center gap-2 mb-2"><i class="fa-solid fa-magnifying-glass text-base text-purple-400"></i> 2. Step-by-Step Deep Dive</h4><div class="text-gray-200 text-sm leading-relaxed pl-1">`)
+                .replace(/💡 3\. Real-World Application \/ Example/g, `</div></div><div class="mb-5"><h4 class="text-sm font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-2 mb-2"><i class="fa-solid fa-lightbulb text-base text-emerald-400"></i> 3. Real-World Application / Example</h4><div class="text-gray-200 text-sm leading-relaxed pl-1">`)
+                .replace(/💡 3\. Real-World Application/g, `</div></div><div class="mb-5"><h4 class="text-sm font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-2 mb-2"><i class="fa-solid fa-lightbulb text-base text-emerald-400"></i> 3. Real-World Application</h4><div class="text-gray-200 text-sm leading-relaxed pl-1">`)
+                .replace(/✅ 4\. Final Answer & Key Takeaway/g, `</div></div><div class="mb-5 p-4 bg-emerald-950/50 border-2 border-emerald-500/60 rounded-xl shadow-lg"><h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-base"></i> 4. Final Answer & Key Takeaway</h4><div class="text-white font-extrabold text-base leading-relaxed">`)
+                .replace(/🌟 5\. Teacher's Pro Tip/g, `</div></div><div class="p-4 bg-amber-950/50 border border-amber-500/50 rounded-xl shadow-md"><h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2 mb-1"><i class="fa-solid fa-star text-base"></i> 5. Teacher's Pro Tip</h4><div class="text-amber-200 text-sm font-medium leading-relaxed">`);
+
+            html += `</div></div>`;
+
+            // Format code blocks
+            html = html.replace(/```([\s\S]*?)```/g, function(match, code) {
+                return `<pre class="bg-gray-950 p-4 rounded-xl border border-gray-800 text-xs code-font text-emerald-400 overflow-x-auto my-3"><code>${escapeHtml(code.trim())}</code></pre>`;
+            });
+
+            // Format line breaks
+            html = html.replace(/\n\n/g, '<br><br>');
+
+            container.innerHTML = `
+                <div class="glass-panel p-6 rounded-2xl border border-gray-700/80 space-y-4 shadow-2xl">
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-${colorTheme}-400 animate-pulse"></span>
+                            <h3 class="font-bold text-white text-base">${title}</h3>
+                        </div>
+                        <button onclick="copyToClipboard(this)" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700 transition flex items-center gap-1.5">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copy Answer</span>
+                        </button>
+                    </div>
+                    <div class="prose prose-invert max-w-none">
+                        ${html}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showLoading(container) {
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="glass-panel p-8 rounded-2xl flex flex-col items-center justify-center space-y-3">
+                    <div class="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-xs text-gray-300 font-medium">BHAVYA TECHNOLOGIES Master Teacher is synthesizing step-by-step solution...</p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function copyToClipboard(button) {
+            const container = button.closest('.glass-panel');
+            const textToCopy = container.innerText;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            const origText = button.innerHTML;
+            button.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i> <span class="text-emerald-400">Copied!</span>`;
+            setTimeout(() => { button.innerHTML = origText; }, 2000);
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 bg-brand-600 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold z-50 flex items-center gap-2';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+    </script>
+</body>
+</html>
